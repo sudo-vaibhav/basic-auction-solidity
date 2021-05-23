@@ -1,17 +1,18 @@
 pragma solidity ^0.8.4;
 
 contract Auction{
-    uint public productCount;
+    // uint public productCount;
     struct Product{
         string name;
         uint minPrice;
         address payable seller;
         uint bidAmount;
         address payable bidder;
-        uint endTime;
+        uint endTime; // this is in milliseconds
         bool sold;
     }
-    mapping(uint => Product) public products;
+
+    Product[] public products;
     
     event ProductEvent (Product);
     
@@ -20,18 +21,17 @@ contract Auction{
     }
     
     function addProduct() public{
-        productCount++;
-        Product memory product = Product("My soul",100,payable(msg.sender),0,payable(address(0)),block.timestamp+10000000,false);
-        products[productCount] = product;
+        Product memory product = Product("My soul",100,payable(msg.sender),0,payable(address(0)),block.timestamp*1000+300000,false); // endTime 5 minutes from time of deployment by default
+        products.push(product);
         emit ProductEvent(product);
     }
     
     function addProduct(string memory _name,uint _minPrice,uint _endTime) public{
         require(_minPrice>0,"minimum price should be a positive integer value");
-        require(block.timestamp<_endTime,"auction end time should be in future");
-        productCount++;
+        require(block.timestamp*1000<_endTime,"auction end time should be in future");
         Product memory product = Product(_name,_minPrice,payable(msg.sender),0,payable(0),_endTime,false);
-        products[productCount] = product;
+        products.push(product);
+        // productCount++;
         emit ProductEvent(product);
     }
     
@@ -39,7 +39,7 @@ contract Auction{
         // follow these checks
         Product storage product = products[_productId];
         // bidding time must be over
-        require(product.endTime < block.timestamp,"bidding for product is not over yet");
+        require(product.endTime < block.timestamp*1000,"bidding for product is not over yet");
         // claimer must be bidder
         require(msg.sender == product.bidder,"you are not eligible to claim this product");
         
@@ -53,13 +53,17 @@ contract Auction{
         
     }
     
+    function getNow() view public returns (uint){
+        return block.timestamp*1000;
+    }
+    
     function bid(uint _productId) payable public{
         Product storage product = products[_productId];
         
         // follow these checks
         
         // time should be lesser than last 
-        require(block.timestamp<product.endTime,"product auction has already ended");
+        require(block.timestamp*1000<product.endTime,"product auction has already ended");
         
         // bid should be greater than minPrice
         require(msg.value>=product.minPrice,"bid value shouldn't be less than the reserve value");
@@ -85,11 +89,6 @@ contract Auction{
     }
 
     function getProducts() view public returns (Product[] memory){
-        Product[] memory temp = new Product[] (productCount);
-        for(uint i=1;i<=productCount;i++){
-            Product memory product = products[i];
-            temp[i] = product;
-        }
-        return temp;
+        return products;
     }
 }
