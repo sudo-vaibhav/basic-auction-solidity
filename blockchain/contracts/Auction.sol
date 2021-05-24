@@ -9,7 +9,7 @@ contract Auction{
         uint bidAmount;
         address payable bidder;
         uint endTime; // this is in milliseconds
-        bool sold;
+        bool claimed;
     }
 
     Product[] public products;
@@ -47,7 +47,7 @@ contract Auction{
         product.seller.transfer(product.bidAmount);
         
         // set product status sold to true
-        product.sold = true;
+        product.claimed = true;
         
         emit ProductEvent(product);
         
