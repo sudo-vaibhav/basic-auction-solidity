@@ -59,6 +59,7 @@ function App() {
 
   return (
     <div className="container" >
+      <h1 style={{marginTop:"4rem"}}>Blockchain Auction</h1>
       <p>Your account: {state.account}</p>
       <div style={{ overflowX: "auto"}}>
       <h2>products:</h2>
@@ -87,7 +88,7 @@ function App() {
               <td>{ new Date(parseInt(product.endTime)).toLocaleString()}</td>
               <td>{ !biddable ? "sold" : "active"}</td>
               <td>
-                {!biddable && product.bidder == state.account && !product.claimed ? <button onClick={() => { claim(idx)}}>Claim</button>: biddable ? <button onClick={() => { bid(idx)} }>
+                {product.bidder == state.account && product.claimed ? "claimed" : !biddable && product.bidder == state.account && !product.claimed ? <button onClick={() => { claim(idx)}}>Claim</button>: biddable ? <button onClick={() => { bid(idx)} }>
                   Place Bid
                 </button> : "-"}</td>
              </tr>
