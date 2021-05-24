@@ -6,6 +6,7 @@ import AddProduct from "./components/AddProduct"
 function App() {
   const [state, setState] = useState({ account: "" })
   async function loadBlockchainData() {
+    window.ethereum.request({ method: 'eth_requestAccounts' });
     const web3 = new Web3(Web3.givenProvider || "http://localhost:8545")
     const accounts = await web3.eth.getAccounts()
     const network = await web3.eth.net.getNetworkType()
